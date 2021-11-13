@@ -2,17 +2,19 @@ namespace DataIntegration
 {
     public class ValutaConversion
     {
-        private string FromCurrency { get; set; }
-        private string ToCurrency { get; set; }
-        private double Rate { get; set; }
-        private string UpdatedAt { get; set; }
+        public int Id { get; set; }
+        public string FromCurrency { get; set; }
+        public string ToCurrency { get; set; }
+        public DateTime UpdatedAt { get; set; }
+        public double Rate { get; set; }
 
-        public ValutaConversion(string fromCurrency, string toCurrency, double rate, string updatedAt)
+        public ValutaConversion(int id, string fromCurrency, string toCurrency, DateTime updatedAt, double rate)
         {
+            Id = id;
             FromCurrency = fromCurrency;
             ToCurrency = toCurrency;
-            Rate = rate;
             UpdatedAt = updatedAt;
+            Rate = rate;
         }
     }
 }

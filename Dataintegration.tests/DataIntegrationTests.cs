@@ -34,7 +34,7 @@ namespace DataIntegration.tests
         {
             var input = System.IO.File.ReadAllText(InputFilePath);
             var actual = DataIntegration.Program.getUpdateDate(input);
-            var expected = "18:08:26.43467 2021-11-10";
+            var expected = new DateTime(2021, 11, 10, 18, 8, 26);
             Assert.Equal(expected, actual);
         }
 
@@ -42,17 +42,17 @@ namespace DataIntegration.tests
         public void GetConversions_returns_IEnumerable_of_ValutaConversions()
         {
             var input = System.IO.File.ReadAllText(InputFilePath);
-            var updateDate = "18:08:26.43467 2021-11-10";
+            var updateDate = new DateTime(2021, 11, 10, 18, 8, 26);
 
             //testing the first 3 instances
             var expected = new List<ValutaConversion>()
             {
-                new ValutaConversion("DKK", "EUR", 14.217386571124935, updateDate),
-                new ValutaConversion("DKK", "USD", 15.92314867267027, updateDate),
-                new ValutaConversion("DKK", "SEK", 134.099726931630624, updateDate)
+                new ValutaConversion(0, "DKK", "EUR", updateDate, 14.217386571124935),
+                new ValutaConversion(1, "DKK", "USD", updateDate, 15.92314867267027),
+                new ValutaConversion(2, "DKK", "SEK", updateDate, 134.099726931630624)
             };
 
-            var conversions = DataIntegration.Program.GetConversions(input);
+            var conversions = DataIntegration.Program.GetConversions(input, updateDate);
 
             var actual = new List<ValutaConversion>();
             using (var iterator = conversions.GetEnumerator())
