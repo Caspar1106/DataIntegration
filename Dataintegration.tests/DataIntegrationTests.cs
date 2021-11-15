@@ -52,7 +52,7 @@ namespace DataIntegration.tests
                 new ValutaConversion(2, "DKK", "SEK", updateDate, 134.099726931630624)
             };
 
-            var conversions = DataIntegration.Program.GetConversions(input, updateDate);
+            var conversions = DataIntegration.Program.getConversions(input, updateDate);
 
             var actual = new List<ValutaConversion>();
             using (var iterator = conversions.GetEnumerator())

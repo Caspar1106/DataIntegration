@@ -6,88 +6,12 @@ namespace DataIntegration
     {
         public static void Main(string[] args)
         {
-            //Get the input, and format it into conversions
-            var input = getCurrentValutaString().Result;
-            var updateDate = getUpdateDate(input);
-            var conversions = GetConversions(input, updateDate);
+            var _controller = new SQLController(new SqlConnection("Server=52.157.108.214;Database=Caspar;User Id=Caspar;Password=TestCase;"));
+            var apiResult = getCurrentValutaString().Result;
+            var updateDate = getUpdateDate(apiResult);
 
-            //Create and open connection to database. 'using' ensures that the connection closes after
-            using (var conn = new SqlConnection("Server=52.157.108.214;Database=Caspar;User Id=Caspar;Password=TestCase;"))
-            {
-                conn.Open();
-
-                using (SqlCommand comm = new SqlCommand())
-                {
-                    //wipe the table
-                    comm.Connection = conn;
-                    comm.CommandText = "DELETE FROM ValutaKurser";
-                    try
-                    {
-                        comm.ExecuteNonQuery();
-                    }
-                    catch (SqlException e)
-                    {
-                        Console.WriteLine("Could not Delete from ValutaKurser with error message: " + e.Message);
-                    }
-
-                    //Allow for inserts into database
-                    comm.CommandText = "SET IDENTITY_INSERT ValutaKurser ON";
-                    try
-                    {
-                        comm.ExecuteNonQuery();
-                    }
-                    catch (SqlException e)
-                    {
-                        Console.WriteLine("Could not execute query with this message: " + e.Message);
-                    }
-
-                    //Insert values
-                    string cmdString = "INSERT INTO ValutaKurser (id, FromCurrency, ToCurrency, UpdatedAt, Rate) VALUES (@val1, @val2, @val3, @val4, @val5)";
-                
-                    comm.CommandText = cmdString;
-
-                    foreach (var val in conversions)
-                    {
-                        comm.Parameters.AddWithValue("@val1", val.Id);
-                        comm.Parameters.AddWithValue("@val2", val.FromCurrency);
-                        comm.Parameters.AddWithValue("@val3", val.ToCurrency);
-                        comm.Parameters.AddWithValue("@val4", val.UpdatedAt);
-                        comm.Parameters.AddWithValue("@val5", val.Rate);
-
-                        try
-                        {
-                            comm.ExecuteNonQuery();
-                        }
-                        catch (SqlException e)
-                        {
-                            Console.WriteLine("Could not execute query with this message: " + e.Message);
-                        }
-                        comm.Parameters.Clear();
-                    }
-
-                    //Ensure that new values cannot be added beyond this point
-                    comm.CommandText = "SET IDENTITY_INSERT ValutaKurser OFF";
-                    try
-                    {
-                        comm.ExecuteNonQuery();
-                    }
-                    catch (SqlException e)
-                    {
-                        Console.WriteLine("Could not execute query with this message: " + e.Message);
-                    }
-                }
-                
-                //Simple print statement to see result
-                /* var command = new SqlCommand("Select * from ValutaKurser", conn);
-                using (var reader = command.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        Console.WriteLine(String.Format("{0}, {1}, {2}, {3}, {4}", reader[0], reader[1], reader[2], reader[3], reader[4]));
-                    }
-                } */
-            }
-
+            _controller.ClearTable();
+            _controller.InsertMultiple(getConversions(apiResult, updateDate));
         }
 
         private static async Task<string> getCurrentValutaString()
@@ -105,7 +29,7 @@ namespace DataIntegration
             return content;
         }
 
-        public static IEnumerable<ValutaConversion> GetConversions(string apiResult, DateTime updateDate)
+        public static IEnumerable<ValutaConversion> getConversions(string apiResult, DateTime updateDate)
         {
             var pattern = @"[a-zA-Z]+.{3}([A-Z]{3}).{3}[a-zA-Z]+.{3}([A-Z]{3}).{3}[a-zA-Z]+.{2}(\d+.\d+)";
             int currentId = 0;
@@ -131,5 +55,6 @@ namespace DataIntegration
             return updateDate;
 
         }
+        
     }
 }
