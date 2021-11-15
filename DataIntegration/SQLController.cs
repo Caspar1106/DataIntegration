@@ -8,7 +8,7 @@ namespace DataIntegration
             _connection = connection;
         }
 
-        public void Insert(ValutaConversion conversion)
+        private void Insert(ValutaConversion conversion)
         {
             string cmdString = "INSERT INTO ValutaKurser (id, FromCurrency, ToCurrency, UpdatedAt, Rate) VALUES (@val1, @val2, @val3, @val4, @val5)";
 
@@ -37,12 +37,24 @@ namespace DataIntegration
 
         public void InsertMultiple(IEnumerable<ValutaConversion> conversions)
         {
-            turnOnIdentityInserts();
+            using (SqlCommand comm = new SqlCommand()) {
+                comm.Connection = _connection;
+                comm.CommandText = "SET IDENTITY_INSERT ValutaKurser ON";
+                openConnection();
+                comm.ExecuteNonQuery();
+                closeConnection();
+            }
             foreach (var conv in conversions)
             {
                 Insert(conv);
             }
-            turnOffIdentityInserts();
+            using (SqlCommand comm = new SqlCommand()) {
+                comm.Connection = _connection;
+                comm.CommandText = "SET IDENTITY_INSERT ValutaKurser OFF";
+                openConnection();
+                comm.ExecuteNonQuery();
+                closeConnection();
+            }
         }
 
         public void ClearTable()
