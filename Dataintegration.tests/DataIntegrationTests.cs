@@ -1,16 +1,18 @@
 
+using System.Data.SqlClient;
+using Microsoft.Data.Sqlite;
 using Xunit;
 namespace DataIntegration.tests
 {
     public class DataIntegrationTests
     {
-        private string InputFilePath = Path.Combine(Directory.GetCurrentDirectory(), "../../../input.txt");
-        private string getUrl = "https://valutakurser.azurewebsites.net/ValutaKurs";
+        private readonly string _InputFilePath = Path.Combine(Directory.GetCurrentDirectory(), "../../../input.txt");
+        private readonly string _getUrl = "https://valutakurser.azurewebsites.net/ValutaKurs";
         [Fact]
         public void Status_Code_returns_OK_using_string()
         {
             HttpClient httpClient = new HttpClient();
-            var http = httpClient.GetAsync(getUrl);
+            var http = httpClient.GetAsync(_getUrl);
             var result = http.Result;
             var actual = result.StatusCode.ToString();
             httpClient.Dispose();
@@ -22,7 +24,7 @@ namespace DataIntegration.tests
         public void Status_Code_returns_OK_using_URI()
         {
             HttpClient httpClient = new HttpClient();
-            var http = httpClient.GetAsync(new Uri(getUrl));
+            var http = httpClient.GetAsync(new Uri(_getUrl));
             var result = http.Result;
             var actual = result.StatusCode.ToString();
             httpClient.Dispose();
@@ -32,7 +34,7 @@ namespace DataIntegration.tests
         [Fact]
         public void Update_Date_returns_correct_date_and_time()
         {
-            var input = System.IO.File.ReadAllText(InputFilePath);
+            var input = System.IO.File.ReadAllText(_InputFilePath);
             var actual = DataIntegration.Program.getUpdateDate(input);
             var expected = new DateTime(2021, 11, 10, 18, 8, 26);
             Assert.Equal(expected, actual);
@@ -41,7 +43,7 @@ namespace DataIntegration.tests
         [Fact]
         public void GetConversions_returns_IEnumerable_of_ValutaConversions()
         {
-            var input = System.IO.File.ReadAllText(InputFilePath);
+            var input = System.IO.File.ReadAllText(_InputFilePath);
             var updateDate = new DateTime(2021, 11, 10, 18, 8, 26);
 
             //testing the first 3 instances
