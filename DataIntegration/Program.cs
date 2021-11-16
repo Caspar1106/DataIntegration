@@ -15,67 +15,19 @@ namespace DataIntegration
             using (var conn = new SqlConnection("Server=52.157.108.214;Database=Caspar;User Id=Caspar;Password=TestCase;"))
             {
                 conn.Open();
-
-                using (SqlCommand comm = new SqlCommand())
-                {
-                    //wipe the table
-                    comm.Connection = conn;
-                    comm.CommandText = "DELETE FROM ValutaKurser";
-                    try
-                    {
-                        comm.ExecuteNonQuery();
-                    }
-                    catch (SqlException e)
-                    {
-                        Console.WriteLine("Could not Delete from ValutaKurser with error message: " + e.Message);
-                    }
-
-                    //Allow for inserts into database
-                    comm.CommandText = "SET IDENTITY_INSERT ValutaKurser ON";
-                    try
-                    {
-                        comm.ExecuteNonQuery();
-                    }
-                    catch (SqlException e)
-                    {
-                        Console.WriteLine("Could not execute query with this message: " + e.Message);
-                    }
-
-                    //Insert values
-                    string cmdString = "INSERT INTO ValutaKurser (id, FromCurrency, ToCurrency, UpdatedAt, Rate) VALUES (@val1, @val2, @val3, @val4, @val5)";
                 
-                    comm.CommandText = cmdString;
+                //wipe the table
+                clearTable(conn);
 
-                    foreach (var val in conversions)
-                    {
-                        comm.Parameters.AddWithValue("@val1", val.Id);
-                        comm.Parameters.AddWithValue("@val2", val.FromCurrency);
-                        comm.Parameters.AddWithValue("@val3", val.ToCurrency);
-                        comm.Parameters.AddWithValue("@val4", val.UpdatedAt);
-                        comm.Parameters.AddWithValue("@val5", val.Rate);
+                //Allow for inserts into database
+                turnOnIdentityInsert(conn);
 
-                        try
-                        {
-                            comm.ExecuteNonQuery();
-                        }
-                        catch (SqlException e)
-                        {
-                            Console.WriteLine("Could not execute query with this message: " + e.Message);
-                        }
-                        comm.Parameters.Clear();
-                    }
+                //Insert values
+                insertValues(conn, conversions);
 
-                    //Ensure that new values cannot be added beyond this point
-                    comm.CommandText = "SET IDENTITY_INSERT ValutaKurser OFF";
-                    try
-                    {
-                        comm.ExecuteNonQuery();
-                    }
-                    catch (SqlException e)
-                    {
-                        Console.WriteLine("Could not execute query with this message: " + e.Message);
-                    }
-                }
+                //Ensure that new values cannot be added beyond this point
+                turnOffIdentityInsert(conn);
+                
                 
                 //Simple print statement to see result
                 /* var command = new SqlCommand("Select * from ValutaKurser", conn);
@@ -89,7 +41,6 @@ namespace DataIntegration
             }
 
         }
-
         private static async Task<string> getCurrentValutaString()
         {
             HttpClient httpClient = new HttpClient();
@@ -131,5 +82,71 @@ namespace DataIntegration
             return updateDate;
 
         }
+
+        public static void clearTable(SqlConnection connection) 
+        {
+            var cmdStr = "DELETE FROM ValutaKurser";
+            using var command = new SqlCommand(cmdStr, connection); 
+            try
+            {
+                command.ExecuteNonQuery();
+            }
+            catch (SqlException e)
+            {
+                Console.WriteLine("Could not Delete from ValutaKurser with error message: " + e.Message);
+            }
+        }
+        public static void turnOnIdentityInsert(SqlConnection connection) 
+        {
+            var cmdStr = "SET IDENTITY_INSERT ValutaKurser ON";
+            using var command = new SqlCommand(cmdStr, connection);
+            try
+            {
+                command.ExecuteNonQuery();
+            }
+            catch (SqlException e)
+            {
+                Console.WriteLine("Could not execute query with this message: " + e.Message);
+            }
+        }
+
+        public static void turnOffIdentityInsert(SqlConnection connection) 
+        {
+            var cmdStr = "SET IDENTITY_INSERT ValutaKurser OFF";
+            using var command = new SqlCommand(cmdStr, connection);
+            try
+            {
+                command.ExecuteNonQuery();
+            }
+            catch (SqlException e)
+            {
+                Console.WriteLine("Could not execute query with this message: " + e.Message);
+            }
+        }
+
+        public static void insertValues(SqlConnection connection, IEnumerable<ValutaConversion> conversions) 
+        {
+            var cmdStr = "INSERT INTO ValutaKurser (id, FromCurrency, ToCurrency, UpdatedAt, Rate) VALUES (@val1, @val2, @val3, @val4, @val5)";
+            using var command = new SqlCommand(cmdStr, connection);
+            foreach (var val in conversions)
+            {
+                command.Parameters.AddWithValue("@val1", val.Id);
+                command.Parameters.AddWithValue("@val2", val.FromCurrency);
+                command.Parameters.AddWithValue("@val3", val.ToCurrency);
+                command.Parameters.AddWithValue("@val4", val.UpdatedAt);
+                command.Parameters.AddWithValue("@val5", val.Rate);
+
+                try
+                {
+                    command.ExecuteNonQuery();
+                }
+                catch (SqlException e)
+                {
+                    Console.WriteLine("Could not execute query with this message: " + e.Message);
+                }
+                command.Parameters.Clear();
+            }
+        }
+
     }
 }
