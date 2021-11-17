@@ -10,6 +10,7 @@ namespace DataIntegration
             var input = getCurrentValutaString().Result;
             var updateDate = getUpdateDate(input);
             var conversions = GetConversions(input, updateDate);
+            
 
             //Create and open connection to database. 'using' ensures that the connection closes after
             using (var conn = new SqlConnection("Server=52.157.108.214;Database=Caspar;User Id=Caspar;Password=TestCase;"))
@@ -20,13 +21,13 @@ namespace DataIntegration
                 clearTable(conn);
 
                 //Allow for inserts into database
-                turnOnIdentityInsert(conn);
+                //turnOnIdentityInsert(conn);
 
                 //Insert values
                 insertValues(conn, conversions);
 
                 //Ensure that new values cannot be added beyond this point
-                turnOffIdentityInsert(conn);
+                //turnOffIdentityInsert(conn);
                 
                 
                 //Simple print statement to see result
@@ -59,7 +60,7 @@ namespace DataIntegration
         public static IEnumerable<ValutaConversion> GetConversions(string apiResult, DateTime updateDate)
         {
             var pattern = @"[a-zA-Z]+.{3}([A-Z]{3}).{3}[a-zA-Z]+.{3}([A-Z]{3}).{3}[a-zA-Z]+.{2}(\d+.\d+)";
-            int currentId = 0;
+            int currentId = 1;
             foreach (Match m in Regex.Matches(apiResult, pattern))
             {
                 var valutaConversion = new ValutaConversion(currentId, m.Groups[1].ToString(), m.Groups[2].ToString(), updateDate, double.Parse(m.Groups[3].ToString()));
