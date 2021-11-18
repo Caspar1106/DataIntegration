@@ -38,22 +38,22 @@ namespace DataIntegration.tests
         }
 
         [Fact]
-        public void GetConversions_returns_IEnumerable_of_ValutaConversions()
+        public void GetConversions_returns_IEnumerable_of_CurrencyConversions()
         {
             var input = System.IO.File.ReadAllText(_InputFilePath);
             var updateDate = new DateTime(2021, 11, 10, 18, 8, 26);
 
             //testing the first 3 instances
-            var expected = new List<ValutaConversionDTO>()
+            var expected = new List<CurrencyConversion>()
             {
-                new ValutaConversionDTO(0, "DKK", "EUR", updateDate, 14.217386571124935),
-                new ValutaConversionDTO(1, "DKK", "USD", updateDate, 15.92314867267027),
-                new ValutaConversionDTO(2, "DKK", "SEK", updateDate, 134.099726931630624)
+                new CurrencyConversion(0, "DKK", "EUR", updateDate, 14.217386571124935),
+                new CurrencyConversion(1, "DKK", "USD", updateDate, 15.92314867267027),
+                new CurrencyConversion(2, "DKK", "SEK", updateDate, 134.099726931630624)
             };
 
             var conversions = DataIntegration.Program.GetConversions(input, updateDate);
 
-            var actual = new List<ValutaConversionDTO>();
+            var actual = new List<CurrencyConversion>();
             using (var iterator = conversions.GetEnumerator())
             {
                 for (int i = 0; i < 3; i++)

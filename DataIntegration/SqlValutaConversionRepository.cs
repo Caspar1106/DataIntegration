@@ -1,15 +1,15 @@
 namespace DataIntegration
 {
-    public class SqlValutaConversionRepository
+    public class SqlCurrencyConversionRepository
     {
         private readonly SqlConnection _connection;
 
-        public SqlValutaConversionRepository(SqlConnection connection)
+        public SqlCurrencyConversionRepository(SqlConnection connection)
         {
             _connection = connection;
         }
 
-        public void Create(ValutaConversionDTO conversion)
+        public void Create(CurrencyConversion conversion)
         {
             var cmdText = @"INSERT ValutaKurser (FromCurrency, ToCurrency, UpdatedAt, Rate)
                             VALUES (@FromCurrency, @ToCurrency, @UpdatedAt, @Rate);

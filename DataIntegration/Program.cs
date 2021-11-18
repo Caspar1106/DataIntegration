@@ -11,7 +11,7 @@
             var config = LoadConfiguration();
             var connectionStr = config.GetConnectionString("ValutaKurser");
 
-            var repository = new SqlValutaConversionRepository(new SqlConnection(connectionStr));
+            var repository = new SqlCurrencyConversionRepository(new SqlConnection(connectionStr));
             
             //this isnt tested
             /* var date = repository.getLastUpdateDate();
@@ -28,7 +28,7 @@
                 repository.Create(conversion);
             }
             
-            repository.ReadAll();
+            //repository.ReadAll();
         }
         static IConfiguration LoadConfiguration()
         {
@@ -54,13 +54,13 @@
             return content;
         }
 
-        public static IEnumerable<ValutaConversionDTO> GetConversions(string apiResult, DateTime updateDate)
+        public static IEnumerable<CurrencyConversion> GetConversions(string apiResult, DateTime updateDate)
         {
             var pattern = @"[a-zA-Z]+.{3}([A-Z]{3}).{3}[a-zA-Z]+.{3}([A-Z]{3}).{3}[a-zA-Z]+.{2}(\d+.\d+)";
             int currentId = 0;
             foreach (Match m in Regex.Matches(apiResult, pattern))
             {
-                var valutaConversion = new ValutaConversionDTO(currentId, m.Groups[1].ToString(), m.Groups[2].ToString(), updateDate, double.Parse(m.Groups[3].ToString()));
+                var valutaConversion = new CurrencyConversion(currentId, m.Groups[1].ToString(), m.Groups[2].ToString(), updateDate, double.Parse(m.Groups[3].ToString()));
                 currentId++;
                 yield return valutaConversion;
             }
