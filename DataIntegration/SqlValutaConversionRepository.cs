@@ -1,6 +1,3 @@
-
-
-
 namespace DataIntegration
 {
     public class SqlValutaConversionRepository
@@ -25,9 +22,9 @@ namespace DataIntegration
             command.Parameters.AddWithValue("@UpdatedAt", conversion.UpdatedAt);
             command.Parameters.AddWithValue("@Rate", conversion.Rate);
 
-            OpenConnection();
             try
             {
+                OpenConnection();
                 command.ExecuteNonQuery();
             }
             catch (SqlException e)
@@ -43,9 +40,9 @@ namespace DataIntegration
         public void ReadAll()
         {
             var command = new SqlCommand("Select * from ValutaKurser", _connection);
-            OpenConnection();
             using (var reader = command.ExecuteReader())
             {
+            OpenConnection();
                 while (reader.Read())
                 {
                     Console.WriteLine(String.Format("{0}, {1}, {2}, {3}, {4}", reader[0], reader[1], reader[2], reader[3], reader[4]));
@@ -58,10 +55,10 @@ namespace DataIntegration
         {
             var cmdStr = "DELETE FROM ValutaKurser";
             using var command = new SqlCommand(cmdStr, _connection);
-            OpenConnection();
 
             try
             {
+                OpenConnection();
                 command.ExecuteNonQuery();
             }
             catch (SqlException e)
@@ -79,10 +76,10 @@ namespace DataIntegration
         {
             var cmdStr = "DBCC CHECKIDENT ('ValutaKurser', RESEED, 0)";
             using var command = new SqlCommand(cmdStr, _connection);
-            OpenConnection();
 
             try
             {
+                OpenConnection();
                 command.ExecuteNonQuery();
             }
             catch (SqlException e)
@@ -99,10 +96,10 @@ namespace DataIntegration
         {
             var cmdStr = "SELECT UpdatedAt FROM ValutaKurser ORDER BY id DESC LIMIT 1";
             using var command = new SqlCommand(cmdStr, _connection);
+
             OpenConnection();
 
             using var reader = command.ExecuteReader();
-
             var lastUpdateDate = reader.Read() ? reader.GetDateTime("UpdatedAt") : new DateTime();
 
             CloseConnection();

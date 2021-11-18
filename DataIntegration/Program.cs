@@ -1,31 +1,34 @@
-﻿using System.Data;
-using Microsoft.Extensions.Configuration;
-
-namespace DataIntegration
+﻿namespace DataIntegration
 {
     public class Program
     {
         public static void Main(string[] args)
         {
-            /* var inputStr = getCurrentValutaString().Result;
+            var inputStr = getCurrentValutaString().Result;
             var currentUpdateDate = getUpdateDate(inputStr);
-            var conversions = GetConversions(inputStr, currentUpdateDate); */
+            var conversions = GetConversions(inputStr, currentUpdateDate);
+
             var config = LoadConfiguration();
             var connectionStr = config.GetConnectionString("ValutaKurser");
+
             var repository = new SqlValutaConversionRepository(new SqlConnection(connectionStr));
             
-            repository.ReadAll();
+            //this isnt tested
             /* var date = repository.getLastUpdateDate();
-            Console.WriteLine(date); */
-        
-            /* foreach(var conversion in conversions) 
+
+            if (DateTime.Compare(currentUpdateDate, date) != 0) 
+            {
+                foreach(var conversion in conversions) 
+                {
+                    repository.Create(conversion);
+                }
+            } */
+            foreach(var conversion in conversions) 
             {
                 repository.Create(conversion);
             }
             
-            repository.ReadAll(); */
-                
-            
+            repository.ReadAll();
         }
         static IConfiguration LoadConfiguration()
         {
@@ -41,10 +44,10 @@ namespace DataIntegration
             HttpClient httpClient = new HttpClient();
             var http = httpClient.GetAsync("https://valutakurser.azurewebsites.net/ValutaKurs");
             var result = http.Result;
+
             if (result.StatusCode.ToString() != "OK")
             {
                 Console.WriteLine("Could not connect to API. Exiting with StatusCode: " + result.StatusCode.ToString());
-                System.Environment.Exit(0);
             }
 
             var content = await result.Content.ReadAsStringAsync();
