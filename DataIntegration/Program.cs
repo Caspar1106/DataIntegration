@@ -8,6 +8,7 @@
             var currentUpdateDate = getUpdateDate(inputStr);
             var conversions = GetConversions(inputStr, currentUpdateDate);
 
+            //User secrets have been used to hide password
             var config = LoadConfiguration();
             var connectionStr = config.GetConnectionString("ValutaKurser");
 
@@ -28,6 +29,7 @@
                 repository.Create(conversion);
             }
             
+            //For testing 
             //repository.ReadAll();
         }
         static IConfiguration LoadConfiguration()
